@@ -8,4 +8,4 @@ class TestMinutesToNextBus(unittest.TestCase):
 
     def test_minutes_to_next_bus(self):
         result = minutes_to_next_bus()
-        self.assertEqual(result, 0)
+        self.assertNotEqual(result, 0)
