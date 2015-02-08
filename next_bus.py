@@ -1,8 +1,14 @@
 from config import credentials
 import requests
+import time
 
 
 class NextBusChecker:
+    def __init__(self):
+        self.last_data_updated_at = None
+        self.last_data_minutes_to_next_bus = None
+        self.minutes_to_next_bus = None
+
     def get_data_from_api(self):
         """
         Gets data from Trafiklab Api
@@ -79,7 +85,7 @@ class NextBusChecker:
 
         return api_result
 
-    def minutes_to_next_bus(self):
+    def get_minutes_to_next_bus(self):
         """
         Gets minutes to next bus
         """
@@ -92,10 +98,25 @@ class NextBusChecker:
         return minutes
 
     def print_next_bus(self):
-        print "Next bus leaves in: %s" % self.minutes_to_next_bus()
+        print "Next bus leaves in: %s" % self.get_minutes_to_next_bus()
         return
+
+    def tick(self):
+        # TODO: data should be updated if more than 30s from now to last_data_updated_at
+
+        # TODO: get and check data
+
+        # TODO: if data is ok, register last_data_updated_at to now, register last_data_minutes_to_next_bus to data
+
+        self.print_next_bus()
+
+    def loop(self):
+        while True:
+            # tick every second
+            self.tick()
+            time.sleep(1)
 
 
 if __name__ == "__main__":
     next_bus_checker = NextBusChecker()
-    next_bus_checker.print_next_bus()
+    next_bus_checker.loop()

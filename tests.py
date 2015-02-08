@@ -46,23 +46,23 @@ class TestMinutesToNextBus(unittest.TestCase):
                                                                  u'DataAge': 13, u'Trains': [], u'Metros': []},
                                                u'Message': None, u'StatusCode': 0}
         self.next_bus_checker.get_data_from_api = Mock(return_value=mock_get_data_from_api_return_value)
-        result = self.next_bus_checker.minutes_to_next_bus()
+        result = self.next_bus_checker.get_minutes_to_next_bus()
         self.assertEqual(result, "3 min")
 
     def test_minutes_to_next_bus_error_in_api_result(self):
         mock_get_data_from_api_return_value = {}
         self.next_bus_checker.get_data_from_api = Mock(return_value=mock_get_data_from_api_return_value)
-        result = self.next_bus_checker.minutes_to_next_bus()
+        result = self.next_bus_checker.get_minutes_to_next_bus()
         self.assertEqual(result, "No data")
         mock_get_data_from_api_return_value = []
         self.next_bus_checker.get_data_from_api = Mock(return_value=mock_get_data_from_api_return_value)
-        result = self.next_bus_checker.minutes_to_next_bus()
+        result = self.next_bus_checker.get_minutes_to_next_bus()
         self.assertEqual(result, "No data")
         mock_get_data_from_api_return_value = ""
         self.next_bus_checker.get_data_from_api = Mock(return_value=mock_get_data_from_api_return_value)
-        result = self.next_bus_checker.minutes_to_next_bus()
+        result = self.next_bus_checker.get_minutes_to_next_bus()
         self.assertEqual(result, "No data")
         mock_get_data_from_api_return_value = "No data"
         self.next_bus_checker.get_data_from_api = Mock(return_value=mock_get_data_from_api_return_value)
-        result = self.next_bus_checker.minutes_to_next_bus()
+        result = self.next_bus_checker.get_minutes_to_next_bus()
         self.assertEqual(result, "No data")
