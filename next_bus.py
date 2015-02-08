@@ -1,6 +1,7 @@
 from config import credentials
 import requests
 import time
+import datetime
 
 
 class NextBusChecker:
@@ -102,11 +103,16 @@ class NextBusChecker:
         return
 
     def tick(self):
-        # TODO: data should be updated if more than 30s from now to last_data_updated_at
+        now = datetime.datetime.now()
+        if self.last_data_updated_at is not None:
+            if (now - self.last_data_updated_at).seconds < 30:
+                return
 
         # TODO: get and check data
-
         # TODO: if data is ok, register last_data_updated_at to now, register last_data_minutes_to_next_bus to data
+        # TODO: if no bus until time X, don't get new data until time X - 15 minutes
+        self.last_data_updated_at = now
+        self.last_data_minutes_to_next_bus = 1
 
         self.print_next_bus()
 
