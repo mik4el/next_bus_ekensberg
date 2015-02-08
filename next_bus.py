@@ -101,11 +101,14 @@ class NextBusChecker:
         return minutes
 
     def print_next_bus(self):
-        print "Next bus leaves in: %s" % self.get_minutes_to_next_bus()
+        print "Next bus leaves in: %s" % self.minutes_to_next_bus
         return
 
     def tick(self):
         now = datetime.datetime.now()
+
+        # TODO: update minutes_to_next_bus using now, last_data_minutes_to_next_bus and last_data_updated_at
+
         if self.last_data_updated_at is not None:
             if (now - self.last_data_updated_at).seconds < 30:
                 return
@@ -118,7 +121,7 @@ class NextBusChecker:
 
         self.last_data_updated_at = now
         self.last_data_minutes_to_next_bus = data
-
+        self.minutes_to_next_bus = self.last_data_minutes_to_next_bus
         self.print_next_bus()
 
     def loop(self):
