@@ -50,7 +50,7 @@ class TestMinutesToNextBus(unittest.TestCase):
     def test_minutes_to_next_bus_standard_api_call(self):
         self.next_bus_checker.get_data_from_api = Mock(return_value=GOOD_API_DATA)
         result = self.next_bus_checker.get_minutes_to_next_bus()
-        self.assertEqual(result, "3 min")
+        self.assertEqual(result, 4)
 
     def test_minutes_to_next_bus_error_in_api_result(self):
         self.next_bus_checker.get_data_from_api = Mock(return_value={})
@@ -67,20 +67,39 @@ class TestMinutesToNextBus(unittest.TestCase):
         self.assertEqual(result, "No data")
 
     def test_first_tick(self):
-        # when no last_data_updated_at, check for data and
         self.next_bus_checker.last_data_updated_at = None
         self.next_bus_checker.get_data_from_api = Mock(return_value=GOOD_API_DATA)
         self.next_bus_checker.tick()
         self.assertIsNotNone(self.next_bus_checker.last_data_updated_at)
         self.assertIsNotNone(self.next_bus_checker.last_data_minutes_to_next_bus)
 
-    def test_nth_tick(self):
-        # when no last_data_updated_at, check for data and
+    def test_nth_tick_in_wait(self):
         old_data_date = datetime.datetime.now() - datetime.timedelta(seconds=29)
         old_last_data = 10
         self.next_bus_checker.last_data_updated_at = old_data_date
         self.next_bus_checker.last_data_minutes_to_next_bus = old_last_data
         self.next_bus_checker.get_data_from_api = Mock(return_value=GOOD_API_DATA)
+        self.next_bus_checker.tick()
+        self.assertEqual(self.next_bus_checker.last_data_updated_at, old_data_date)
+        self.assertEqual(self.next_bus_checker.last_data_minutes_to_next_bus, old_last_data)
+
+    def test_nth_tick_after_wait(self):
+        old_data_date = datetime.datetime.now() - datetime.timedelta(seconds=31)
+        old_last_data = 10
+        self.next_bus_checker.last_data_updated_at = old_data_date
+        self.next_bus_checker.last_data_minutes_to_next_bus = old_last_data
+        self.next_bus_checker.get_data_from_api = Mock(return_value=GOOD_API_DATA)
+        self.next_bus_checker.tick()
+        self.assertNotEqual(self.next_bus_checker.last_data_updated_at, old_data_date)
+        self.assertNotEqual(self.next_bus_checker.last_data_minutes_to_next_bus, old_last_data)
+
+    def test_nth_tick_with_nodata(self):
+        old_data_date = datetime.datetime.now() - datetime.timedelta(seconds=31)
+        old_last_data = 10
+        self.next_bus_checker.last_data_updated_at = old_data_date
+        self.next_bus_checker.last_data_minutes_to_next_bus = old_last_data
+        self.next_bus_checker.get_data_from_api = Mock(return_value=GOOD_API_DATA)
+        self.next_bus_checker.get_minutes_to_next_bus = Mock(return_value="No data")
         self.next_bus_checker.tick()
         self.assertEqual(self.next_bus_checker.last_data_updated_at, old_data_date)
         self.assertEqual(self.next_bus_checker.last_data_minutes_to_next_bus, old_last_data)

@@ -74,7 +74,6 @@ class NextBusChecker:
         """
 
         api_url = "https://api.sl.se/api2/realtimedepartures.json?key=%s&siteid=1600&timewindow=60" % credentials.TRAFIKLAB_API_KEY
-        #print "Accessing api using url: %s" % api_url
 
         try:
             api_request = requests.get(api_url, timeout=10)
@@ -82,7 +81,6 @@ class NextBusChecker:
             api_result = "No data"
         else:
             api_result = api_request.json()
-        #print "Result: %s" % api_result
 
         return api_result
 
@@ -91,11 +89,15 @@ class NextBusChecker:
         Gets minutes to next bus
         """
         api_result = self.get_data_from_api()
-
+        print api_result
         try:
-            minutes = api_result["ResponseData"]["Buses"][0]["DisplayTime"]
+            expected_time = api_result["ResponseData"]["Buses"][0]["ExpectedDateTime"]
+            sl_time = api_result["ResponseData"]["LatestUpdate"]
         except (KeyError, TypeError):
-            minutes = "No data"
+            return "No data"
+        expected_time = datetime.datetime.strptime(expected_time, "%Y-%m-%dT%H:%M:%S")
+        sl_time = datetime.datetime.strptime(sl_time, "%Y-%m-%dT%H:%M:%S")
+        minutes = (expected_time - sl_time).seconds / 60
         return minutes
 
     def print_next_bus(self):
@@ -108,11 +110,14 @@ class NextBusChecker:
             if (now - self.last_data_updated_at).seconds < 30:
                 return
 
-        # TODO: get and check data
-        # TODO: if data is ok, register last_data_updated_at to now, register last_data_minutes_to_next_bus to data
         # TODO: if no bus until time X, don't get new data until time X - 15 minutes
+
+        data = self.get_minutes_to_next_bus()
+        if data == "No data":
+            return
+
         self.last_data_updated_at = now
-        self.last_data_minutes_to_next_bus = 1
+        self.last_data_minutes_to_next_bus = data
 
         self.print_next_bus()
 
