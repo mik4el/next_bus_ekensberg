@@ -77,6 +77,14 @@ class TestMinutesToNextBus(unittest.TestCase):
         result = self.next_bus_checker.get_minutes_to_next_bus()
         self.assertEqual(result, 0)
 
+    def test_minutes_to_next_bus_no_bus(self):
+        data = {u'ExecutionTime': 72, u'ResponseData': {u'LatestUpdate': u'2015-02-09T21:14:55', u'Buses': [],
+                                                        u'Ships': [], u'StopPointDeviations': [], u'Trams': [],
+                                                        u'DataAge': 20, u'Trains': [], u'Metros': []},
+                u'Message': None, u'StatusCode': 0}
+        self.next_bus_checker.get_data_from_api = Mock(return_value=data)
+        result = self.next_bus_checker.get_minutes_to_next_bus()
+        self.assertEqual(result, "No bus")
 
     def test_minutes_to_next_bus_error_in_api_result(self):
         self.next_bus_checker.get_data_from_api = Mock(return_value={})
@@ -98,6 +106,7 @@ class TestMinutesToNextBus(unittest.TestCase):
         self.next_bus_checker.tick()
         self.assertIsNotNone(self.next_bus_checker.last_data_updated_at)
         self.assertIsNotNone(self.next_bus_checker.last_data_minutes_to_next_bus)
+        self.assertTrue(self.next_bus_checker.bus_is_coming)
 
     def test_nth_tick_in_wait(self):
         old_data_date = datetime.datetime.now() - datetime.timedelta(seconds=29)
@@ -114,10 +123,30 @@ class TestMinutesToNextBus(unittest.TestCase):
         old_last_data = 10
         self.next_bus_checker.last_data_updated_at = old_data_date
         self.next_bus_checker.last_data_minutes_to_next_bus = old_last_data
+        self.next_bus_checker.bus_is_coming = True
         self.next_bus_checker.get_data_from_api = Mock(return_value=GOOD_API_DATA)
         self.next_bus_checker.tick()
         self.assertNotEqual(self.next_bus_checker.last_data_updated_at, old_data_date)
         self.assertNotEqual(self.next_bus_checker.last_data_minutes_to_next_bus, old_last_data)
+        self.assertTrue(self.next_bus_checker.bus_is_coming)
+
+    def test_nth_tick_no_bus(self):
+        now = datetime.datetime.now()
+        self.next_bus_checker.get_now = Mock(return_value=now)
+        old_data_date = now - datetime.timedelta(seconds=31)
+        old_last_data = 10
+        self.next_bus_checker.last_data_updated_at = old_data_date
+        self.next_bus_checker.last_data_minutes_to_next_bus = old_last_data
+        self.next_bus_checker.bus_is_coming = True
+        data = {u'ExecutionTime': 72, u'ResponseData': {u'LatestUpdate': u'2015-02-09T21:14:55', u'Buses': [],
+                                                        u'Ships': [], u'StopPointDeviations': [], u'Trams': [],
+                                                        u'DataAge': 20, u'Trains': [], u'Metros': []},
+                u'Message': None, u'StatusCode': 0}
+        self.next_bus_checker.get_data_from_api = Mock(return_value=data)
+        self.next_bus_checker.tick()
+        self.assertEqual(self.next_bus_checker.last_data_updated_at, now)
+        self.assertIsNone(self.next_bus_checker.last_data_minutes_to_next_bus)
+        self.assertFalse(self.next_bus_checker.bus_is_coming)
 
     def test_nth_tick_with_nodata(self):
         old_data_date = datetime.datetime.now() - datetime.timedelta(seconds=31)

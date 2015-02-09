@@ -9,6 +9,7 @@ class NextBusChecker:
         self.last_data_updated_at = None
         self.last_data_minutes_to_next_bus = None
         self.minutes_to_next_bus = None
+        self.bus_is_coming = False
 
     def get_data_from_api(self):
         """
@@ -89,15 +90,14 @@ class NextBusChecker:
         Gets minutes to next bus
         """
         api_result = self.get_data_from_api()
-        print api_result
         try:
             expected_time = api_result["ResponseData"]["Buses"][0]["ExpectedDateTime"]
             latest_update = api_result["ResponseData"]["LatestUpdate"]
             data_age = api_result["ResponseData"]["DataAge"]
         except (KeyError, TypeError):
             return "No data"
-
-        # TODO: Handle when no buses, return "No bus"
+        except IndexError:
+            return "No bus"
 
         expected_time = datetime.datetime.strptime(expected_time, "%Y-%m-%dT%H:%M:%S")
         latest_update = datetime.datetime.strptime(latest_update, "%Y-%m-%dT%H:%M:%S")
@@ -109,14 +109,27 @@ class NextBusChecker:
         return minutes
 
     def print_next_bus(self):
-        print "Next bus leaves in: %s minutes (%s, data from: %s)" % (
-            self.minutes_to_next_bus, self.last_data_updated_at, self.get_now())
-        return
+        if self.last_data_updated_at is None:
+            print "Getting data"
+            return
+        if self.bus_is_coming:
+            print "Next bus leaves in: %s minutes (%s, data from: %s)" % (
+                self.minutes_to_next_bus, self.last_data_updated_at, self.get_now())
+        else:
+            print "No bus in data (%s, data from: %s)" % (self.last_data_updated_at, self.get_now())
 
     def get_now(self):
         return datetime.datetime.now()
 
     def recalculate_minutes_to_next_bus(self):
+        # Check data
+        if self.last_data_updated_at is None:
+            self.minutes_to_next_bus = None
+            return
+        if self.last_data_minutes_to_next_bus is None:
+            self.minutes_to_next_bus = None
+            return
+
         # When no data recorded, don't recalculate
         if self.last_data_updated_at is None:
             return
@@ -133,26 +146,33 @@ class NextBusChecker:
 
         self.print_next_bus()
 
+        # Check if data should be updated
         if self.last_data_updated_at is not None:
             if (now - self.last_data_updated_at).seconds < 30:
-                # Don't update data
                 return
 
         if self.minutes_to_next_bus > 10:
-            # Don't update data
             return
 
+        if not self.bus_is_coming and self.last_data_updated_at is not None:
+            if (now - self.last_data_updated_at).seconds < 1800:
+                return
+
+        # Update and handle data
         data = self.get_minutes_to_next_bus()
+
         if data == "No data":
             # Don't update data
             return
 
-        # TODO: When no bus, set flag no bus, poll every 30 minutes
-
-        # Update data
-        self.last_data_updated_at = now
-        self.last_data_minutes_to_next_bus = data
-        self.minutes_to_next_bus = self.last_data_minutes_to_next_bus
+        if data == "No bus":
+            self.last_data_updated_at = now
+            self.last_data_minutes_to_next_bus = None
+            self.bus_is_coming = False
+        else:
+            self.last_data_updated_at = now
+            self.last_data_minutes_to_next_bus = data
+            self.bus_is_coming = True
 
     def loop(self):
         while True:
