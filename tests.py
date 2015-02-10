@@ -2,7 +2,7 @@ import unittest
 from next_bus import NextBusChecker
 from mock import Mock
 import datetime
-
+import Queue
 
 GOOD_API_DATA = {u"ExecutionTime": 92,
                  u'ResponseData': {u'LatestUpdate': u'2015-02-08T17:10:50', u'Buses': [
@@ -45,7 +45,7 @@ GOOD_API_DATA = {u"ExecutionTime": 92,
 
 class TestMinutesToNextBus(unittest.TestCase):
     def setUp(self):
-        self.next_bus_checker = NextBusChecker()
+        self.next_bus_checker = NextBusChecker(Queue.Queue())
 
     def test_minutes_to_next_bus_standard_api_call(self):
         self.next_bus_checker.get_data_from_api = Mock(return_value=GOOD_API_DATA)

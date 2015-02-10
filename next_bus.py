@@ -3,15 +3,18 @@ import requests
 import time
 import datetime
 import threading
+from Tkinter import *
+import Queue
 
 
 class NextBusChecker(threading.Thread):
-    def __init__(self):
+    def __init__(self, busInfoQueue):
         super(NextBusChecker, self).__init__()
         self.last_data_updated_at = None
         self.last_data_minutes_to_next_bus = None
         self.minutes_to_next_bus = None
         self.bus_is_coming = False
+        self.busInfoQueue = busInfoQueue
 
     def get_data_from_api(self):
         """
@@ -147,6 +150,12 @@ class NextBusChecker(threading.Thread):
 
         self.recalculate_minutes_to_next_bus()
 
+        busInfo = NextBusInfo()
+        busInfo.last_data_updated_at = self.last_data_updated_at
+        busInfo.minutes_to_next_bus = self.minutes_to_next_bus
+        busInfo.bus_is_coming = self.bus_is_coming
+        self.busInfoQueue.put(busInfo)
+
         self.print_next_bus()
 
         # Check if data should be updated
@@ -184,6 +193,62 @@ class NextBusChecker(threading.Thread):
             time.sleep(1)
 
 
+class NextBusInfo:
+    last_data_updated_at = None
+    now = None
+    minutes_to_next_bus = None
+    bus_is_coming = False
+
+
+class NextBusVisualization:
+    def __init__(self, busInfoQueue):
+        self.root = None
+        self.canvas = None
+        self.busInfo = None
+        self.busInfoQueue = busInfoQueue
+        self.nextBusLabel = None
+        self.state = False
+
+    def start(self):
+        # Start Tkinter
+        self.root = Tk()
+        self.root.title("Next Bus Visualization")
+
+        w = self.root.winfo_screenwidth()
+        h = self.root.winfo_screenheight()
+        self.root.overrideredirect(True)
+        self.root.geometry("{0}x{1}+0+0".format(w, h))
+
+        # Draw GUI
+        self.canvas = Canvas(self.root, width=w, height=h, bg='white')
+        self.canvas.pack(expand=YES, fill=BOTH)
+
+        self.nextBusLabel = Label(self.canvas, text="Startar...", font=("Helvetica", -h/2))
+        self.nextBusLabel.pack()
+        self.canvas.create_window(w/2, h/2, window=self.nextBusLabel)
+
+        self.root.after(0, self.updateLoop())
+        self.root.mainloop()
+
+    def updateLoop(self):
+        while True:
+            # Only redraw if new item in busInfoQueue
+            if not self.busInfoQueue.empty():
+                self.busInfo = self.busInfoQueue.get()
+            self.redraw()
+            time.sleep(0.5)
+
+    def redraw(self):
+        # Draw busInfo
+        if self.busInfo:
+            self.nextBusLabel.config(text="%s min" % self.busInfo.minutes_to_next_bus)
+            self.canvas.update()
+
+
 if __name__ == "__main__":
-    next_bus_checker = NextBusChecker()
+    busInfoQueue = Queue.Queue()
+    next_bus_checker = NextBusChecker(busInfoQueue)
+    next_bus_checker.daemon = True
     next_bus_checker.start()
+    nextBusVisualization = NextBusVisualization(busInfoQueue)
+    nextBusVisualization.start()
