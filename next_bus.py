@@ -2,10 +2,12 @@ from config import credentials
 import requests
 import time
 import datetime
+import threading
 
 
-class NextBusChecker:
+class NextBusChecker(threading.Thread):
     def __init__(self):
+        super(NextBusChecker, self).__init__()
         self.last_data_updated_at = None
         self.last_data_minutes_to_next_bus = None
         self.minutes_to_next_bus = None
@@ -90,6 +92,7 @@ class NextBusChecker:
         Gets minutes to next bus
         """
         api_result = self.get_data_from_api()
+        print api_result
         try:
             expected_time = api_result["ResponseData"]["Buses"][0]["ExpectedDateTime"]
             latest_update = api_result["ResponseData"]["LatestUpdate"]
@@ -114,9 +117,9 @@ class NextBusChecker:
             return
         if self.bus_is_coming:
             print "Next bus leaves in: %s minutes (%s, data from: %s)" % (
-                self.minutes_to_next_bus, self.last_data_updated_at, self.get_now())
+                self.minutes_to_next_bus, self.get_now(), self.last_data_updated_at)
         else:
-            print "No bus in data (%s, data from: %s)" % (self.last_data_updated_at, self.get_now())
+            print "No bus in data (%s, data from: %s)" % (self.get_now(), self.last_data_updated_at)
 
     def get_now(self):
         return datetime.datetime.now()
@@ -174,7 +177,7 @@ class NextBusChecker:
             self.last_data_minutes_to_next_bus = data
             self.bus_is_coming = True
 
-    def loop(self):
+    def run(self):
         while True:
             # tick every second
             self.tick()
@@ -183,4 +186,4 @@ class NextBusChecker:
 
 if __name__ == "__main__":
     next_bus_checker = NextBusChecker()
-    next_bus_checker.loop()
+    next_bus_checker.start()
