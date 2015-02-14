@@ -7,6 +7,14 @@ Application to find and visualize time for the next SL bus leaving from Ekensber
 1. Deploy to raspi with external screen
 1. Make case for screen
 
+# Nice to have features
+1. Blinka ett tecken varje sekund eller liknande
+1. “.” om datan är ok
+1. “?” om fel med datan
+1. “Zzz” istället för “X min” när “no bus"
+
+Visa nästa buss när tiden kvar är 3 min
+
 # Installing hardware
 Download latest robopeak raspbian image from http://www.robopeak.com/docs/doku.php?id=product-rpusbdisp-downloads, then follow http://www.raspberrypi.org/documentation/installation/installing-images/mac.md
 
