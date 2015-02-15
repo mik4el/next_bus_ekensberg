@@ -14,6 +14,7 @@ class NextBusChecker(threading.Thread):
         self.last_data_minutes_to_next_bus = None
         self.minutes_to_next_bus = None
         self.bus_is_coming = False
+        self.error_with_data = False
         self.busInfoQueue = busInfoQueue
 
     def get_data_from_api(self):
@@ -154,6 +155,7 @@ class NextBusChecker(threading.Thread):
         busInfo.last_data_updated_at = self.last_data_updated_at
         busInfo.minutes_to_next_bus = self.minutes_to_next_bus
         busInfo.bus_is_coming = self.bus_is_coming
+        busInfo.error_with_data = self.error_with_data
         self.busInfoQueue.put(busInfo)
 
         self.print_next_bus()
@@ -174,17 +176,17 @@ class NextBusChecker(threading.Thread):
         data = self.get_minutes_to_next_bus()
 
         if data == "No data":
-            # Don't update data
-            return
-
-        if data == "No bus":
+            self.error_with_data = True
+        elif data == "No bus":
             self.last_data_updated_at = now
             self.last_data_minutes_to_next_bus = None
             self.bus_is_coming = False
+            self.error_with_data = False
         else:
             self.last_data_updated_at = now
             self.last_data_minutes_to_next_bus = data
             self.bus_is_coming = True
+            self.error_with_data = False
 
     def run(self):
         while True:
@@ -198,6 +200,7 @@ class NextBusInfo:
     now = None
     minutes_to_next_bus = None
     bus_is_coming = False
+    error_with_data = False
 
 
 class NextBusVisualization:
@@ -207,7 +210,7 @@ class NextBusVisualization:
         self.busInfo = None
         self.busInfoQueue = busInfoQueue
         self.nextBusLabel = None
-        self.state = False
+        self.isBlinking = False
 
     def start(self):
         # Start Tkinter
@@ -223,9 +226,9 @@ class NextBusVisualization:
         self.canvas = Canvas(self.root, width=w, height=h, bg='white')
         self.canvas.pack(expand=YES, fill=BOTH)
 
-        self.nextBusLabel = Label(self.canvas, text="Startar...", font=("Helvetica", -h/2))
+        self.nextBusLabel = Label(self.canvas, text="Startar...", font=("Helvetica", -int(h / 2.2)))
         self.nextBusLabel.pack()
-        self.canvas.create_window(w/2, h/2, window=self.nextBusLabel)
+        self.canvas.create_window(w / 2, h / 2, window=self.nextBusLabel)
 
         self.root.after(0, self.updateLoop())
         self.root.mainloop()
@@ -241,7 +244,22 @@ class NextBusVisualization:
     def redraw(self):
         # Draw busInfo
         if self.busInfo:
-            self.nextBusLabel.config(text="%s min" % self.busInfo.minutes_to_next_bus)
+            if self.isBlinking:
+                if self.busInfo.error_with_data:
+                    symbol = "?"
+                else:
+                    symbol = "."
+            else:
+                symbol = " "
+            self.isBlinking = not self.isBlinking
+
+            if self.busInfo.bus_is_coming:
+                text = "%s min" % self.busInfo.minutes_to_next_bus
+            else:
+                text = "Zzz"
+            text = "%s%s" % (text, symbol)
+
+            self.nextBusLabel.config(text=text)
             self.canvas.update()
 
 

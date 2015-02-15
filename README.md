@@ -2,16 +2,11 @@
 Application to find and visualize time for the next SL bus leaving from Ekensberg station, Stockholm, Sweden. 
 
 # Todos
-1. Tests for visualization
 1. Make provisioning script installing e.g. vnc
 1. Deploy to raspi with external screen
 1. Make case for screen
 
 # Nice to have features
-1. Blinka ett tecken varje sekund eller liknande
-1. “.” om datan är ok
-1. “?” om fel med datan
-1. “Zzz” istället för “X min” när “no bus"
 1. Visa nästa buss när tiden kvar är 3 min
 
 # Installing hardware
