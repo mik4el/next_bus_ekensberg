@@ -223,10 +223,10 @@ class NextBusVisualization:
         self.root.geometry("{0}x{1}+0+0".format(w, h))
 
         # Draw GUI
-        self.canvas = Canvas(self.root, width=w, height=h, bg='white')
+        self.canvas = Canvas(self.root, width=w, height=h, background="white")
         self.canvas.pack(expand=YES, fill=BOTH)
 
-        self.nextBusLabel = Label(self.canvas, text="Startar...", font=("Helvetica", -int(h / 2.2)))
+        self.nextBusLabel = Label(self.canvas, text="Startar...", font=("Helvetica", -int(h / 2.4)), background="white")
         self.nextBusLabel.pack()
         self.canvas.create_window(w / 2, h / 2, window=self.nextBusLabel)
 

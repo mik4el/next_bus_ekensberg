@@ -2,12 +2,10 @@
 Application to find and visualize time for the next SL bus leaving from Ekensberg station, Stockholm, Sweden. 
 
 # Todos
-1. Make provisioning script installing e.g. vnc
-1. Deploy to raspi with external screen
 1. Make case for screen
 
 # Nice to have features
-1. Visa nästa buss när tiden kvar är 3 min
+1. Show the next next bus when time to next bus < 3min
 
 # Installing hardware
 Download latest robopeak raspbian image from http://www.robopeak.com/docs/doku.php?id=product-rpusbdisp-downloads, then follow http://www.raspberrypi.org/documentation/installation/installing-images/mac.md
