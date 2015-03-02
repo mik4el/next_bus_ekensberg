@@ -19,8 +19,10 @@ There are probably many devices in your network. If one device has port 22 open 
 
 Go to terminal and input with the ip you found:
 
-`ssh pi@192.168.1.4`
+```
+ssh pi@192.168.1.4
 password: raspberry
+```
 
 Don't run apt-get upgrade, it will overwrite the rpusbdisp support.
 
@@ -58,7 +60,7 @@ xset s off
 xset -dpms
 ```
 
-In lightdm conf /etc/lightdm/lightdm.conf change xserver-command under [SeatDefaults] to:
+Stop Lightdm from blanking. In lightdm conf /etc/lightdm/lightdm.conf change xserver-command under [SeatDefaults] to:
 ```
 xserver-command=X -s 0 -dpms
 ```
