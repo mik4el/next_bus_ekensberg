@@ -76,7 +76,7 @@ def setup_supervisord():
 
 def restart():
     with cd(env.release_dir):
-        sudo("supervisorctl restart next_bus_ekensberg")
+        sudo("supervisorctl start next_bus_ekensberg")
 
 
 def start():

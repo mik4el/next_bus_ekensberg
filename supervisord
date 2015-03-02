@@ -1,6 +1,6 @@
 #! /bin/bash -e
 
-SUPERVISORD=/home/pi/source/env/bin/supervisord
+SUPERVISORD=/usr/local/bin/supervisord
 PIDFILE=/var/run/supervisord.pid
 OPTS="-c /home/pi/source/next_bus_ekensberg/supervisord.conf"
 
@@ -8,7 +8,11 @@ test -x $SUPERVISORD || exit 0
 
 . /lib/lsb/init-functions
 
-export PATH="${PATH:+$PATH:}/usr/local/bin:/usr/sbin:/sbin:/home/pi/source/env/bin/"
+export PATH="${PATH:+$PATH:}/usr/local/bin:/usr/sbin:/sbin"
+
+export DISPLAY=:0.0
+
+export XAUTHORITY=/home/pi/.Xauthority
 
 case "$1" in
   start)
