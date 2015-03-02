@@ -2,7 +2,7 @@ from fabric.api import *
 from fabric.contrib.files import exists
 
 env.roledefs = {
-    'pi': ['pi@10.0.0.15'],  # requires key based auth on server
+    'pi': ['pi@192.168.1.4'],  # requires key based auth on server
 }
 
 env.project_name = 'next_bus_ekensberg'
@@ -76,7 +76,7 @@ def setup_supervisord():
 
 def restart():
     with cd(env.release_dir):
-        sudo("supervisorctl start next_bus_ekensberg")
+        sudo("supervisorctl restart next_bus_ekensberg")
 
 
 def start():
