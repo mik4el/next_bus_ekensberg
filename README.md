@@ -4,6 +4,10 @@ Application to find and visualize time for the next SL bus leaving from Ekensber
 # Todos
 1. Make numbers little bigger
 1. Show the next next bus when time to next bus < 3min
+1. Handle error when API shows error:
+```
+{u'ExecutionTime': 4254, u'ResponseData': {u'LatestUpdate': u'0001-01-01T00:00:00', u'Buses': [], u'Ships': [], u'StopPointDeviations': [], u'Trams': [], u'DataAge': 0, u'Trains': [], u'Metros': []}, u'Message': u'Could not retrive information for buses, trains or trams.', u'StatusCode': 5322}
+```
 
 # Installing hardware
 Download latest robopeak raspbian image from http://www.robopeak.com/docs/doku.php?id=product-rpusbdisp-downloads, then follow http://www.raspberrypi.org/documentation/installation/installing-images/mac.md
