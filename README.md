@@ -1,10 +1,13 @@
 # Next Bus Ekensberg
 Application to find and visualize time for the next SL bus leaving from Ekensberg station, Stockholm, Sweden. 
 
+# Suggested hardware
+Raspberry B+, Wifi USB Nano (WiFi-R-Pi), 2.8 TFT Rpusbdisp (http://www.robopeak.com/data/doc/rpusbdisp/RPUD01-rpusbdisp_datasheet-enUS.1.2.pdf) with 3D printed enclosure (see folder rpusbdisp_enclosure in repo).
+
 # Todos
 1. Make numbers little bigger
 1. Show the next next bus when time to next bus < 3min
-1. Handle error when API shows error:
+1. Fix bug that next update takes 30min when API shows error, should poll every minute:
 ```
 {u'ExecutionTime': 4254, u'ResponseData': {u'LatestUpdate': u'0001-01-01T00:00:00', u'Buses': [], u'Ships': [], u'StopPointDeviations': [], u'Trams': [], u'DataAge': 0, u'Trains': [], u'Metros': []}, u'Message': u'Could not retrive information for buses, trains or trams.', u'StatusCode': 5322}
 ```
