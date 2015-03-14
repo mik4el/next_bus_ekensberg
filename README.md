@@ -11,6 +11,29 @@ Raspberry B+, Wifi USB Nano (WiFi-R-Pi), 2.8 TFT Rpusbdisp (http://www.robopeak.
 ```
 {u'ExecutionTime': 4254, u'ResponseData': {u'LatestUpdate': u'0001-01-01T00:00:00', u'Buses': [], u'Ships': [], u'StopPointDeviations': [], u'Trams': [], u'DataAge': 0, u'Trains': [], u'Metros': []}, u'Message': u'Could not retrive information for buses, trains or trams.', u'StatusCode': 5322}
 ```
+1. Fix rare bug
+```
+ValueError: No JSON object could be decoded
+    raise ValueError("No JSON object could be decoded")
+  File "/usr/lib/python2.7/json/decoder.py", line 383, in raw_decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/usr/lib/python2.7/json/decoder.py", line 365, in decode
+    return _default_decoder.decode(s)
+  File "/usr/lib/python2.7/json/__init__.py", line 326, in loads
+    return json.loads(self.text, **kwargs)
+  File "/usr/local/lib/python2.7/dist-packages/requests/models.py", line 799, in json
+    api_result = api_request.json()
+  File "/home/pi/source/next_bus_ekensberg/next_bus.py", line 90, in get_data_from_api
+    api_result = self.get_data_from_api()
+  File "/home/pi/source/next_bus_ekensberg/next_bus.py", line 98, in get_minutes_to_next_bus
+    data = self.get_minutes_to_next_bus()
+  File "/home/pi/source/next_bus_ekensberg/next_bus.py", line 176, in tick
+    self.tick()
+  File "/home/pi/source/next_bus_ekensberg/next_bus.py", line 194, in run
+    self.run()
+  File "/usr/lib/python2.7/threading.py", line 552, in __bootstrap_inner
+Traceback (most recent call last):
+```
 
 # Installing hardware
 Download latest robopeak raspbian image from http://www.robopeak.com/docs/doku.php?id=product-rpusbdisp-downloads, then follow http://www.raspberrypi.org/documentation/installation/installing-images/mac.md
