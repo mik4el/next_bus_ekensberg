@@ -87,7 +87,10 @@ class NextBusChecker(threading.Thread):
         except:
             api_result = "No data"
         else:
-            api_result = api_request.json()
+            try:
+                api_result = api_request.json()
+            except:
+                api_result = "No data"
 
         return api_result
 
@@ -226,7 +229,7 @@ class NextBusVisualization:
         self.canvas = Canvas(self.root, width=w, height=h, background="white", cursor='none')
         self.canvas.pack(expand=YES, fill=BOTH)
 
-        self.nextBusLabel = Label(self.canvas, text="Startar...", font=("Helvetica", -int(h / 2.4)), background="white")
+        self.nextBusLabel = Label(self.canvas, text="Startar...", font=("Helvetica", -int(h / 1.5)), background="white")
         self.nextBusLabel.pack()
         self.canvas.create_window(w / 2, h / 2, window=self.nextBusLabel)
 
@@ -254,7 +257,7 @@ class NextBusVisualization:
             self.isBlinking = not self.isBlinking
 
             if self.busInfo.bus_is_coming:
-                text = "%s min" % self.busInfo.minutes_to_next_bus
+                text = "%s" % self.busInfo.minutes_to_next_bus
             else:
                 text = "Zzz"
             text = "%s%s" % (text, symbol)
