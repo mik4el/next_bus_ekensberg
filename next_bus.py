@@ -82,15 +82,16 @@ class NextBusChecker(threading.Thread):
 
         api_url = "https://api.sl.se/api2/realtimedepartures.json?key=%s&siteid=1600&timewindow=60" % credentials.TRAFIKLAB_API_KEY
 
+        api_result = "No data"
         try:
             api_request = requests.get(api_url, timeout=10)
         except:
-            api_result = "No data"
+            pass
         else:
             try:
                 api_result = api_request.json()
             except:
-                api_result = "No data"
+                pass
 
         return api_result
 
