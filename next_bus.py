@@ -22,12 +22,13 @@ class NextBusChecker(threading.Thread):
         Gets data from Trafiklab Api
 
         Api call format:
-        https://api.sl.se/api2/realtimedepartures.json?key=<TRAFIKLAB_API_KEY>&siteid=<SITEID>&timewindow=<TIMEWINDOW>
+        
+        https://api.sl.se/api2/realtimedeparturesV4.json?key=<TRAFIKLAB_API_KEY>&siteid=<SITEID>&timewindow=<TIMEWINDOW>
         SITEID for Ekensberg is 1600 (2015-02-07)
         TIMEWINDOW is integer for minutes from now, max is 60.
 
         Api call for Ekensberg for 60 minutes:
-        https://api.sl.se/api2/realtimedepartures.json?key=<TRAFIKLAB_API_KEY>&siteid=1600&timewindow=60
+        https://api.sl.se/api2/realtimedeparturesV4.json?key=<TRAFIKLAB_API_KEY>&siteid=1600&timewindow=60
 
         Example response:
         {
@@ -80,7 +81,7 @@ class NextBusChecker(threading.Thread):
         }
         """
 
-        api_url = "https://api.sl.se/api2/realtimedepartures.json?key=%s&siteid=1600&timewindow=60" % credentials.TRAFIKLAB_API_KEY
+        api_url = "https://api.sl.se/api2/realtimedeparturesV4.json?key=%s&siteid=1600&timewindow=60" % credentials.TRAFIKLAB_API_KEY
 
         api_result = "No data"
         try:
